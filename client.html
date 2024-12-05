@@ -1,0 +1,15 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io('http://localhost:3000');
+    
+    // Bergabung dengan channel
+    socket.emit('join_channel', 1, 'username');
+
+    // Mengirim pesan
+    socket.emit('send_message', 'Hello, world!');
+    
+    // Menerima pesan
+    socket.on('receive_message', (data) => {
+        console.log(`${data.username}: ${data.message}`);
+    });
+</script>
