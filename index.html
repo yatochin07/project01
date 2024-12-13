@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe</title>
+    <title>Tic-Tac-Toe Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="game-container">
+    <div class="container">
         <h1>Tic-Tac-Toe</h1>
-        <div class="mode-selection">
-            <button id="player-vs-player">Player vs Player</button>
-            <button id="player-vs-computer">Player vs Computer</button>
-        </div>
-        <div id="game-board" class="board">
+        <div id="board">
             <div class="row">
                 <button class="cell" id="cell-1">1</button>
                 <button class="cell" id="cell-2">2</button>
@@ -30,9 +26,9 @@
                 <button class="cell" id="cell-9">9</button>
             </div>
         </div>
-        <div id="status-message"></div>
-        <button id="reset-button" class="hidden">Play Again</button>
+        <div id="status"></div>
+        <button id="resetButton">Reset Game</button>
+        <script src="script.js"></script>
     </div>
-    <script src="game.js"></script>
 </body>
 </html>
