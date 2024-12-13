@@ -1,110 +1,85 @@
-const board = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-let currentPlayer = 'X';
-let gameMode = null;
+let board = ['1', '2', '3', '4', '5', '6', '7', '8', '9']; // board representation
+let currentPlayer = 'X'; // Start with player X
 let gameOver = false;
 
-const cells = Array.from(document.querySelectorAll('.cell'));
-const statusMessage = document.getElementById('status-message');
-const resetButton = document.getElementById('reset-button');
-const playerVsPlayerButton = document.getElementById('player-vs-player');
-const playerVsComputerButton = document.getElementById('player-vs-computer');
+const cells = document.querySelectorAll('.cell');
+const statusDiv = document.getElementById('status');
+const resetButton = document.getElementById('resetButton');
 
-playerVsPlayerButton.addEventListener('click', () => startGame('player-vs-player'));
-playerVsComputerButton.addEventListener('click', () => startGame('player-vs-computer'));
-resetButton.addEventListener('click', resetGame);
-
-function startGame(mode) {
-    gameMode = mode;
-    gameOver = false;
-    board.fill('1', 0, 9);
-    updateBoard();
-    statusMessage.textContent = `Player 1 (X) Turn`;
-    resetButton.classList.add('hidden');
-}
-
-function resetGame() {
-    startGame(gameMode);
-    resetButton.classList.add('hidden');
-}
-
+// Update the board UI
 function updateBoard() {
     cells.forEach((cell, index) => {
         cell.textContent = board[index];
-        cell.disabled = board[index] === 'X' || board[index] === 'O';
     });
 }
 
+// Check for a win or a draw
 function checkWin() {
     const winPatterns = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],  // Rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],  // Columns
-        [0, 4, 8], [2, 4, 6]               // Diagonals
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
     ];
 
-    for (const pattern of winPatterns) {
-        if (board[pattern[0]] === board[pattern[1]] && board[pattern[1]] === board[pattern[2]]) {
-            return board[pattern[0]];
+    for (let pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (board[a] === board[b] && board[b] === board[c]) {
+            return board[a];
         }
     }
 
-    return board.includes('1') || board.includes('2') || board.includes('3') || board.includes('4') ||
-           board.includes('5') || board.includes('6') || board.includes('7') || board.includes('8') || board.includes('9') 
-        ? null : 'Draw';
+    // Check for a draw
+    if (!board.includes('1') && !board.includes('2') && !board.includes('3') && !board.includes('4') && !board.includes('5') && !board.includes('6') && !board.includes('7') && !board.includes('8') && !board.includes('9')) {
+        return 'Draw';
+    }
+
+    return null; // Game is ongoing
 }
 
-function playerMove(cellIndex) {
+// Handle cell click
+function cellClick(event) {
     if (gameOver) return;
-    
+
+    const cellIndex = event.target.id.split('-')[1] - 1; // Get the index from the button id
     if (board[cellIndex] !== 'X' && board[cellIndex] !== 'O') {
         board[cellIndex] = currentPlayer;
         updateBoard();
-
         const winner = checkWin();
+
         if (winner) {
             gameOver = true;
-            statusMessage.textContent = winner === 'X' || winner === 'O'
-                ? `Player ${winner === 'X' ? '1' : '2'} wins!`
-                : 'It\'s a Draw!';
-            resetButton.classList.remove('hidden');
-        } else {
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            statusMessage.textContent = `Player ${currentPlayer === 'X' ? '1' : '2'} Turn`;
-            
-            if (gameMode === 'player-vs-computer' && currentPlayer === 'O' && !gameOver) {
-                computerMove();
+            if (winner === 'Draw') {
+                statusDiv.textContent = 'It\'s a draw!';
+            } else {
+                statusDiv.textContent = `Player ${winner} wins!`;
             }
+        } else {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // Switch player
         }
     }
 }
 
-function computerMove() {
-    if (gameOver) return;
-
-    const bestMove = getBestMove();
-    board[bestMove] = 'O';
+// Reset the game
+function resetGame() {
+    board = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    currentPlayer = 'X';
+    gameOver = false;
+    statusDiv.textContent = '';
     updateBoard();
-
-    const winner = checkWin();
-    if (winner) {
-        gameOver = true;
-        statusMessage.textContent = winner === 'X' || winner === 'O'
-            ? `Player ${winner === 'X' ? '1' : '2'} wins!`
-            : 'It\'s a Draw!';
-        resetButton.classList.remove('hidden');
-    } else {
-        currentPlayer = 'X';
-        statusMessage.textContent = 'Player 1 Turn';
-    }
 }
 
-function getBestMove() {
-    const emptyCells = board
-        .map((value, index) => (value !== 'X' && value !== 'O') ? index : null)
-        .filter(index => index !== null);
-
-    return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-}
-
-cells.forEach((cell, index) => {
-    cell.addEventListener('click', () => playerMove(index));
+// Add event listeners to cells
+cells.forEach(cell => {
+    cell.addEventListener('click', cellClick);
 });
+
+// Add reset button listener
+resetButton.addEventListener('click', resetGame);
+
+// Initialize the game
+updateBoard();
