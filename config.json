@@ -1,0 +1,6 @@
+{
+  "game_id": 1,
+  "board": ["X", "O", "X", "4", "5", "6", "7", "O", "X"],
+  "current_player": "O",
+  "winner": null
+}
