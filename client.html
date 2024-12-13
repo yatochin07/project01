@@ -1,15 +1,125 @@
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io('http://localhost:3000');
-    
-    // Bergabung dengan channel
-    socket.emit('join_channel', 1, 'username');
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permainan Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            margin-top: 20px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background-color: #fff;
+        }
+        .cell:hover {
+            background-color: #f0f0f0;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="board" id="board"></div>
+        <div class="status" id="status"></div>
+        <button id="resetButton">Mulai Permainan Baru</button>
+    </div>
 
-    // Mengirim pesan
-    socket.emit('send_message', 'Hello, world!');
-    
-    // Menerima pesan
-    socket.on('receive_message', (data) => {
-        console.log(`${data.username}: ${data.message}`);
-    });
-</script>
+    <script>
+        const boardElement = document.getElementById("board");
+        const statusElement = document.getElementById("status");
+        const resetButton = document.getElementById("resetButton");
+        
+        let board = ['1', '2', '3', '4', '5', '6', '7', '8', '9']; // Representasi papan
+        let currentPlayer = 'X'; // Pemain yang sedang giliran
+        let gameOver = false;
+
+        // Membuat papan permainan
+        function renderBoard() {
+            boardElement.innerHTML = '';
+            board.forEach((cell, index) => {
+                const cellElement = document.createElement('div');
+                cellElement.classList.add('cell');
+                cellElement.textContent = cell;
+                cellElement.addEventListener('click', () => handleCellClick(index));
+                boardElement.appendChild(cellElement);
+            });
+        }
+
+        // Menangani klik pada sel papan
+        function handleCellClick(index) {
+            if (gameOver || board[index] === 'X' || board[index] === 'O') return;
+
+            board[index] = currentPlayer;
+            renderBoard();
+            if (checkWin()) {
+                statusElement.textContent = `Selamat! Pemain ${currentPlayer} menang!`;
+                gameOver = true;
+            } else if (board.every(cell => cell === 'X' || cell === 'O')) {
+                statusElement.textContent = 'Permainan Seri!';
+                gameOver = true;
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                statusElement.textContent = `Giliran Pemain ${currentPlayer}`;
+            }
+        }
+
+        // Memeriksa apakah ada pemenang
+        function checkWin() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Baris
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Kolom
+                [0, 4, 8], [2, 4, 6]              // Diagonal
+            ];
+            return winningCombinations.some(combination => {
+                const [a, b, c] = combination;
+                return board[a] === currentPlayer && board[b] === currentPlayer && board[c] === currentPlayer;
+            });
+        }
+
+        // Tombol untuk memulai ulang permainan
+        resetButton.addEventListener('click', () => {
+            board = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            currentPlayer = 'X';
+            gameOver = false;
+            statusElement.textContent = `Giliran Pemain ${currentPlayer}`;
+            renderBoard();
+        });
+
+        // Inisialisasi papan permainan
+        renderBoard();
+    </script>
+</body>
+</html>
